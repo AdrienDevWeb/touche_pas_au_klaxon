@@ -1,28 +1,27 @@
 <?php
-// 1. Démarrage de la session pour garder l'utilisateur connecté
+// 1. Démarrage de la session pour la gestion de l'utilisateur connecté
 session_start();
 
-// 2. Configuration des chemins
+// 2. Définition de la racine du projet pour faciliter les inclusions
 define('ROOT', dirname(__DIR__));
 
-// 3. Connexion à la base de données (via le fichier config créé précédemment)
+// 3. Connexion à la base de données
 require_once ROOT . '/config/db.php';
 
 // 4. Récupération de la page demandée (par défaut 'home')
 $page = $_GET['page'] ?? 'home';
 
-// 5. LOGIQUE DE CONNEXION : Si on soumet le formulaire de login
+// 5. LOGIQUE DE CONNEXION (Traitement du formulaire)
 if ($page === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // On prépare la requête pour trouver l'employé par son email
+    // Recherche de l'employé dans la base
     $stmt = $pdo->prepare("SELECT * FROM employes WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    // On vérifie si l'utilisateur existe et si le mot de passe est correct
-    // (Note : on utilise le mot de passe "1234" que tu as mis dans HeidiSQL)
+    // Vérification du mot de passe (en texte clair pour l'instant comme dans HeidiSQL)
     if ($user && $password === $user['password']) {
         $_SESSION['user'] = [
             'id' => $user['id_employe'],
@@ -30,7 +29,6 @@ if ($page === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             'prenom' => $user['prenom'],
             'role' => $user['role']
         ];
-        // Redirection vers l'accueil après connexion réussie
         header('Location: index.php?page=home');
         exit;
     } else {
@@ -45,21 +43,25 @@ if ($page === 'logout') {
     exit;
 }
 
-// 7. AFFICHAGE DES VUES (Le squelette HTML)
+// 7. STRUCTURE D'AFFICHAGE (Vue)
 require_once ROOT . '/src/Views/header.php';
 
-// Le Switcher de contenu
+// Aiguillage vers le contenu de la page demandée
 switch ($page) {
     case 'home':
         echo "<main class='container mt-5'>
-                <div class='p-5 mb-4 bg-light rounded-3'>
+                <div class='p-5 mb-4 bg-light rounded-3 shadow-sm'>
                     <div class='container-fluid py-5'>
-                        <h1 class='display-5 fw-bold'>Bienvenue chez Touche pas au klaxon !</h1>";
+                        <h1 class='display-5 fw-bold text-dark'>Bienvenue chez Touche pas au klaxon !</h1>";
         
         if (isset($_SESSION['user'])) {
-            echo "<p class='col-md-8 fs-4 text-success'>Ravi de vous revoir, " . $_SESSION['user']['prenom'] . " !</p>";
+            // Message personnalisé si connecté
+            echo "<p class='col-md-8 fs-4 text-success'>Ravi de vous revoir, " . htmlspecialchars($_SESSION['user']['prenom']) . " !</p>";
+            echo "<a href='index.php?page=trajets' class='btn btn-primary btn-lg'>Voir les trajets</a>";
         } else {
-            echo "<p class='col-md-8 fs-4'>Trouvez votre trajet en un clic ou proposez le vôtre.</p>";
+            // Message standard
+            echo "<p class='col-md-8 fs-4'>Simplifiez vos déplacements professionnels entre agences.</p>";
+            echo "<a href='index.php?page=login' class='btn btn-primary btn-lg'>Espace Employé</a>";
         }
         
         echo "      </div>
@@ -68,10 +70,17 @@ switch ($page) {
         break;
 
     case 'login':
+        // Charge le formulaire de connexion
         require_once ROOT . '/src/Views/login.php';
         break;
 
+    case 'trajets':
+        // Charge la nouvelle page de liste des trajets
+        require_once ROOT . '/src/Views/trajets.php';
+        break;
+
     default:
+        // Page d'erreur si l'URL est inconnue
         echo "<div class='container mt-5'><h1>404 - Page non trouvée</h1></div>";
         break;
 }
