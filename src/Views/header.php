@@ -1,54 +1,90 @@
+<?php
+/**
+ * Header global de l'application.
+ * Contient la navigation et la charte graphique Klaxon.
+ */
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Touche pas au klaxon - Covoiturage</title>
+    <title>Klaxon - Covoiturage d'entreprise</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <style>
-        .navbar-brand { font-weight: bold; }
-        .nav-link:hover { color: #198754 !important; }
+        :root {
+            --klaxon-blue: #0074c7;      
+            --klaxon-dark: #00497c;      
+            --klaxon-gray: #384050;      
+            --klaxon-green: #82b864;     
+            --klaxon-bg: #f1f8fc;        
+        }
+
+        body { 
+            background-color: var(--klaxon-bg); 
+            color: var(--klaxon-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar { 
+            background-color: var(--klaxon-dark) !important; 
+        }
+
+        .btn-primary { 
+            background-color: var(--klaxon-blue) !important; 
+            border: none; 
+        }
+
+        .btn-success, .bg-success { 
+            background-color: var(--klaxon-green) !important; 
+            border: none; 
+        }
+
+        /* Style pour le titre et le trait bleu */
+        .text-info { color: var(--klaxon-dark) !important; }
+        .title-underline {
+            width: 60px;
+            height: 4px;
+            background-color: var(--klaxon-blue);
+            border-radius: 2px;
+            margin: 0 auto 30px;
+        }
+
+        footer {
+            background-color: var(--klaxon-gray) !important;
+            color: white;
+        }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm mb-4">
     <div class="container">
-        <a class="navbar-brand" href="index.php?page=home">
-            🎺 Touche pas au klaxon
-        </a>
+        <a class="navbar-brand fw-bold" href="index.php">KLAXON</a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link" href="index.php?page=home">Accueil</a>
-                </li>
+            <div class="navbar-nav ms-auto">
+                <?php 
+                
+                $currentPage = isset($_GET['page']) ? $_GET['page'] : 'trajets'; 
+                ?>
+                
+                <a class="nav-link <?= ($currentPage == 'trajets') ? 'active' : '' ?>" href="index.php?page=trajets">Trajets</a>
                 
                 <?php if (isset($_SESSION['user'])): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php?page=trajets">Trajets</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-info" href="index.php?page=proposer">Proposer un trajet</a>
-                    </li>
-                    <li class="nav-item ms-lg-3">
-                        <span class="navbar-text me-3">
-                            👋 Bonjour, <strong><?= htmlspecialchars($_SESSION['user']['prenom']) ?></strong>
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <a href="index.php?page=logout" class="btn btn-sm btn-outline-danger">Déconnexion</a>
-                    </li>
+                    <a class="nav-link <?= ($currentPage == 'proposer') ? 'active' : '' ?>" href="index.php?page=proposer">Proposer</a>
+                    <a class="nav-link btn btn-outline-light btn-sm ms-lg-3" href="index.php?page=logout">Déconnexion</a>
                 <?php else: ?>
-                    <li class="nav-item ms-lg-3">
-                        <a href="index.php?page=login" class="btn btn-sm btn-primary">Connexion</a>
-                    </li>
+                    <a class="nav-link <?= ($currentPage == 'login') ? 'active' : '' ?>" href="index.php?page=login">Connexion</a>
                 <?php endif; ?>
-            </ul>
+            </div>
         </div>
     </div>
 </nav>

@@ -1,53 +1,59 @@
-<?php
-$sql = "SELECT t.*, dep.nom_ville AS ville_dep, arr.nom_ville AS ville_arr, emp.prenom AS conducteur
-        FROM trajets t
-        JOIN agences dep ON t.id_agence_depart = dep.id_agence
-        JOIN agences arr ON t.id_agence_arrivee = arr.id_agence
-        JOIN employes emp ON t.id_conducteur = emp.id_employe
-        ORDER BY t.gdh_depart ASC";
-$trajets = $pdo->query($sql)->fetchAll();
-?>
+<?php include 'header.php'; ?>
 
-<main class="container mt-5">
-    <div class="d-flex justify-content-between mb-4">
-        <h2>Trajets disponibles</h2>
-        <?php if(isset($_SESSION['user'])): ?>
-            <a href="index.php?page=proposer" class="btn btn-success">Proposer un trajet</a>
-        <?php endif; ?>
+<div class="container mt-5">
+    <?php if (isset($_GET['reserved'])): ?>
+        <div class="alert alert-success border-0 shadow-sm mb-4">✅ Réservation confirmée !</div>
+    <?php endif; ?>
+
+    <div class="text-center mb-5">
+        <h2 class="fw-bold" style="color: var(--klaxon-dark);">Trajets à la une</h2>
+        <div class="title-underline mx-auto"></div>
     </div>
 
-    <table class="table table-striped shadow-sm bg-white">
-        <thead class="table-dark">
-            <tr>
-                <th>Départ -> Arrivée</th>
-                <th>Date / Heure</th>
-                <th>Conducteur</th>
-                <th>Places</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($trajets as $t): ?>
-                <tr>
-                    <td><strong><?= $t['ville_dep'] ?></strong> → <strong><?= $t['ville_arr'] ?></strong></td>
-                    <td><?= date('d/m/H:i', strtotime($t['gdh_depart'])) ?></td>
-                    <td><span class="badge bg-light text-dark"><?= $t['conducteur'] ?></span></td>
-                    <td><?= $t['places_disponibles'] ?> / <?= $t['places_totales'] ?></td>
-                    <td>
-                        <?php if (isset($_SESSION['user'])): ?>
-                            <?php if ($_SESSION['user']['id'] == $t['id_conducteur']): ?>
-                                <a href="index.php?page=delete_trajet&id=<?= $t['id_trajet'] ?>" 
-                                   class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ?')">Supprimer</a>
-                            <?php elseif ($t['places_disponibles'] > 0): ?>
-                                <a href="index.php?page=reserver&id=<?= $t['id_trajet'] ?>" 
-                                   class="btn btn-sm btn-outline-primary">Réserver</a>
+    <div class="row justify-content-center">
+        <?php foreach ($trajets as $trajet): ?>
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius: 15px;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3" style="color: var(--klaxon-blue);">
+                            <?= htmlspecialchars($trajet['ville_depart']) ?> → <?= htmlspecialchars($trajet['ville_arrivee']) ?>
+                        </h5>
+                        <p class="mb-2"><strong><?= date('d/m/Y à H:i', strtotime($trajet['gdh_depart'])) ?></strong></p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <span class="badge px-3 py-2" style="background-color: <?= $trajet['places_disponibles'] > 0 ? 'var(--klaxon-green)' : '#6c757d' ?>;">
+                                <?= $trajet['places_disponibles'] ?> places libres
+                            </span>
+                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal<?= $trajet['id_trajet'] ?>">Détails</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modal<?= $trajet['id_trajet'] ?>" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">Détails du trajet</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <p><strong>Conducteur :</strong> <?= htmlspecialchars($trajet['prenom_conducteur']) ?></p>
+                            <p><strong>Places totales :</strong> <?= $trajet['places_totales'] ?></p>
+                            <p><strong>État :</strong> <?= $trajet['places_disponibles'] > 0 ? 'Disponible' : 'Complet' ?></p>
+                        </div>
+                        <div class="modal-footer">
+                            <?php if ($trajet['places_disponibles'] > 0): ?>
+                                <a href="index.php?page=reserver&id=<?= $trajet['id_trajet'] ?>" class="btn btn-primary">Réserver ma place</a>
                             <?php else: ?>
-                                <span class="badge bg-secondary">Complet</span>
+                                <button class="btn btn-secondary" disabled>Complet</button>
                             <?php endif; ?>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</main>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<?php include 'footer.php'; ?>

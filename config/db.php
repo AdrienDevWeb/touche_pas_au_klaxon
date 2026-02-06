@@ -1,15 +1,8 @@
 <?php
-// Configuration de la connexion
-$host = 'localhost';
-$dbname = 'touche_pas_au_klaxon';
-$username = 'root';
-$password = '';
-
 try {
-    // Création de la connexion PDO
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    // On active les erreurs pour débugger plus facilement
+    $pdo = new PDO('mysql:host=localhost;dbname=touche_pas_au_klaxon;charset=utf8mb4', 'root', '');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Erreur de connexion : " . $e->getMessage());
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    die('Erreur : ' . $e->getMessage());
 }

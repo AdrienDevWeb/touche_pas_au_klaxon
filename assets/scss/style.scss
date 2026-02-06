@@ -1,0 +1,26 @@
+// 1. Importation des fonctions Bootstrap
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
+// 2. Définition de ta palette imposée
+$blanc-casse: #f1f8fc;
+$bleu-azur: #0074c7;
+$bleu-fonce: #00497c;
+$gris-anthracite: #384050;
+$rouge-klaxon: #cd2c2e;
+$vert-klaxon: #82b864;
+
+// 3. Mise à jour des variables système de Bootstrap
+$primary: $bleu-azur;
+$success: $vert-klaxon;
+$danger: $rouge-klaxon;
+$body-bg: $blanc-casse;
+$body-color: $gris-anthracite;
+
+// 4. Importation du reste de Bootstrap
+@import "node_modules/bootstrap/scss/bootstrap";
+
+// 5. Styles personnalisés
+.navbar {
+    background-color: $bleu-fonce !important;
+}

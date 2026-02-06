@@ -1,0 +1,12 @@
+AGENCES (id_agence, nom_ville)
+    - PK: id_agence
+
+EMPLOYES (id_employe, nom, prenom, telephone, email, password, role)
+    - PK: id_employe
+    - UNIQUE: email
+
+TRAJETS (id_trajet, #id_agence_depart, #id_agence_arrivee, gdh_depart, gdh_arrivee, places_totales, places_disponibles, #id_conducteur)
+    - PK: id_trajet
+    - FK: id_agence_depart -> AGENCES(id_agence)
+    - FK: id_agence_arrivee -> AGENCES(id_agence)
+    - FK: id_conducteur -> EMPLOYES(id_employe)
